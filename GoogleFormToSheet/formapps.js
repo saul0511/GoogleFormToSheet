@@ -1,5 +1,5 @@
 // template sheet url
-const tUrl = 'https://docs.google.com/spreadsheets/d/1L_JWreH-mLccBATtSS4IHuwJTka9au-nV4QE5HaLFR8/edit#gid=0';  
+const tUrl = '';  
 
 // set default ID cards pixel width
 const idCardWidth = 400;
@@ -8,7 +8,7 @@ function onFormSubmit(e) {
 
   // get responses from google form
  
-  //var form = FormApp.openById('1FE_eUVA1Nng6ZR-YuFCvBgX_foxUaRB1WgnUon9WFGg'); // Form ID
+  //var form = FormApp.openById(''); // Form ID
   //var formResponses = form.getResponses();
 
   var formResponses = FormApp.getActiveForm().getResponses();  
