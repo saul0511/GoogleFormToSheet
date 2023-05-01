@@ -8,7 +8,7 @@ function onFormSubmit(e) {
 
   // get responses from google form
  
-  //var form = FormApp.openById(''); // Form ID
+  //var form = FormApp.openById('1FE_eUVA1Nng6ZR-YuFCvBgX_foxUaRB1WgnUon9WFGg'); // Form ID
   //var formResponses = form.getResponses();
 
   var formResponses = FormApp.getActiveForm().getResponses();  
@@ -74,6 +74,13 @@ function onFormSubmit(e) {
   // move files
   folder.addFile(file);
   Logger.log("write files complete.");
+
+  // delete temp image files
+  for(var it = 0 ; it < imageTitleArray.length ; it++){
+    var imageId = imageIdArray[it];    
+    var imageFile = DriveApp.getFileById(imageId); // failed to get
+    imageFile.setTrashed(true);  
+  }
 }
 
 function copyAndReplaceItem(srcSpreadsheet, dstSpreadsheet, titleArray, responseArray, imageTitleArray, imageIdArray){
@@ -112,12 +119,8 @@ function copyAndReplaceItem(srcSpreadsheet, dstSpreadsheet, titleArray, response
             if(titleArray[t] === "姓名"){
               name = responseArray[t] + dateString;
             }
-
-            // 這邊可能要存職業工會的flag           
           }
         }
-
-        // 可能要補職業工會的判斷，有加入職業工會不用存圖片
 
         // compare all image titles and insert all images
         for(var it = 0 ; it < imageTitleArray.length ; it++){
@@ -128,9 +131,18 @@ function copyAndReplaceItem(srcSpreadsheet, dstSpreadsheet, titleArray, response
           
             var imageId = imageIdArray[it];
 
-            var imgBlob = DriveApp.getFileById(imageId).getBlob();
-            var img = dSheet.insertImage(imgBlob, col+1, row+1);
+            // adjust image blob
+            var imgTempBlob = DriveApp.getFileById(imageId).getBlob();
+            var fileId = DriveApp.createFile(imgTempBlob).getId();
+            var link = Drive.Files.get(fileId).thumbnailLink.replace(/\=s.+/, "=s" + idCardWidth);
+            var imgBlob = UrlFetchApp.fetch(link).getBlob();
+            Drive.Files.remove(fileId);
             
+            var img = dSheet.insertImage(imgBlob, col+1, row+1);
+
+            /*var imgBlob = DriveApp.getFileById(imageId).getBlob();
+            var img = dSheet.insertImage(imgBlob, col+1, row+1);
+
             // adjust image width to fit current border
             var imgWidth = img.getWidth();
             var imgHeight = img.getHeight();
@@ -138,8 +150,7 @@ function copyAndReplaceItem(srcSpreadsheet, dstSpreadsheet, titleArray, response
             var scale = idCardWidth / imgWidth;
 
             img.setWidth(imgWidth * scale);
-            img.setHeight(imgHeight * scale);
-
+            img.setHeight(imgHeight * scale);*/
    
           }        
         }    
